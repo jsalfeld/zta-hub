@@ -1,0 +1,10 @@
+{
+  "sources": [
+    { "source_id": "ehr_pipeline", "public_key_hex": "GENERATED_BY_START_LOCAL_SH" },
+    { "source_id": "drug_interaction_pipeline", "public_key_hex": "GENERATED_BY_START_LOCAL_SH" },
+    { "source_id": "dea_license_pipeline", "public_key_hex": "GENERATED_BY_START_LOCAL_SH" },
+    { "source_id": "patient_consent_pipeline", "public_key_hex": "GENERATED_BY_START_LOCAL_SH" },
+    { "source_id": "hipaa_compliance_pipeline", "public_key_hex": "GENERATED_BY_START_LOCAL_SH" },
+    { "source_id": "audit_pipeline", "public_key_hex": "GENERATED_BY_START_LOCAL_SH" }
+  ]
+}

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package governance.schemas;
+
+// A declarative interface for a Skill
+message SkillContract {
+    string skill_id = 1;
+    string version = 2;
+    
+    // e.g., "read_only", "internal_effect", "external_effect"
+    string risk_classification = 3;
+    
+    // JSON schema defining the inputs
+    string input_schema_json = 4;
+    
+    // JSON schema defining the outputs
+    string output_schema_json = 5;
+    
+    // List of prerequisite types this skill consumes
+    repeated string consumes_prerequisites = 6;
+    
+    // List of prerequisite types this skill produces (e.g. "drug_interaction_cleared")
+    repeated string produces_prerequisites = 7;
+}

@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "schemas",
+    "engine",
+    "state",
+    "broker",
+    "hub_server"
+]
+resolver = "2"

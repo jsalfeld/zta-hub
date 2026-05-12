@@ -1,0 +1,84 @@
+{
+  "skills": [
+    {
+      "contract": {
+        "skill_id": "prescribe_medication",
+        "version": "1.0.0",
+        "risk_classification": "critical",
+        "input_schema_json": "{\"patient_id\":\"string\", \"medication\":\"string\", \"dosage\":\"string\"}",
+        "output_schema_json": "{\"status\":\"string\"}",
+        "consumes_prerequisites": ["ehr_data", "drug_interaction_cleared", "dea_license_valid"],
+        "produces_prerequisites": []
+      },
+      "description": "Prescribe medication to a patient after verifying EHR data, drug interactions, and DEA license.",
+      "requirements": [
+        {
+          "source_id": "ehr_pipeline",
+          "data_type": "ehr_data",
+          "description": "Verifies patient identity and retrieves current medical record from the EHR system.",
+          "oracle_url": "http://localhost:5050/ehr/v1/verify",
+          "oracle_method": "POST",
+          "oracle_request_schema": "{\n  \"patient_id\": \"<PATIENT_ID>\",\n  \"intent_id\": \"<INTENT_ID>\"\n}"
+        },
+        {
+          "source_id": "drug_interaction_pipeline",
+          "data_type": "drug_interaction_cleared",
+          "description": "Checks the proposed medication against the patient's current prescriptions for dangerous interactions.",
+          "oracle_url": "http://localhost:5050/drug/v1/check",
+          "oracle_method": "POST",
+          "oracle_request_schema": "{\n  \"patient_id\": \"<PATIENT_ID>\",\n  \"medication\": \"<MEDICATION>\",\n  \"intent_id\": \"<INTENT_ID>\"\n}"
+        },
+        {
+          "source_id": "dea_license_pipeline",
+          "data_type": "dea_license_valid",
+          "description": "Validates that the prescribing agent holds a current DEA license for the medication schedule.",
+          "oracle_url": "http://localhost:5050/dea/v1/validate",
+          "oracle_method": "POST",
+          "oracle_request_schema": "{\n  \"agent_id\": \"<AGENT_ID>\",\n  \"medication\": \"<MEDICATION>\",\n  \"intent_id\": \"<INTENT_ID>\"\n}"
+        }
+      ],
+      "policy_file": "prescribe_medication.cedar",
+      "execution_mode": "broker_mediated"
+    },
+    {
+      "contract": {
+        "skill_id": "release_medical_records",
+        "version": "1.0.0",
+        "risk_classification": "high",
+        "input_schema_json": "{\"patient_id\":\"string\", \"recipient\":\"string\"}",
+        "output_schema_json": "{\"status\":\"string\"}",
+        "consumes_prerequisites": ["patient_consent", "hipaa_compliant", "audit_logged"],
+        "produces_prerequisites": []
+      },
+      "description": "Release patient medical records to a third-party recipient after verifying consent, HIPAA compliance, and audit logging.",
+      "requirements": [
+        {
+          "source_id": "patient_consent_pipeline",
+          "data_type": "patient_consent",
+          "description": "Confirms the patient has provided explicit consent for record release to the specified recipient.",
+          "oracle_url": "http://localhost:5050/consent/v1/verify",
+          "oracle_method": "POST",
+          "oracle_request_schema": "{\n  \"patient_id\": \"<PATIENT_ID>\",\n  \"recipient\": \"<RECIPIENT>\",\n  \"intent_id\": \"<INTENT_ID>\"\n}"
+        },
+        {
+          "source_id": "hipaa_compliance_pipeline",
+          "data_type": "hipaa_compliant",
+          "description": "Validates that the release meets HIPAA minimum-necessary and de-identification requirements.",
+          "oracle_url": "http://localhost:5050/hipaa/v1/check",
+          "oracle_method": "POST",
+          "oracle_request_schema": "{\n  \"patient_id\": \"<PATIENT_ID>\",\n  \"recipient\": \"<RECIPIENT>\",\n  \"intent_id\": \"<INTENT_ID>\"\n}"
+        },
+        {
+          "source_id": "audit_pipeline",
+          "data_type": "audit_logged",
+          "description": "Ensures the record release event is pre-logged in the compliance audit trail.",
+          "oracle_url": "http://localhost:5050/audit/v1/log",
+          "oracle_method": "POST",
+          "oracle_request_schema": "{\n  \"patient_id\": \"<PATIENT_ID>\",\n  \"action\": \"release_medical_records\",\n  \"intent_id\": \"<INTENT_ID>\"\n}"
+        }
+      ],
+      "policy_file": "release_medical_records.cedar",
+      "execution_mode": "broker_mediated"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+[package]
+name = "engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+schemas = { path = "../schemas" }
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+cedar-policy = "3"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
+hex = "0.4.3"
+sha2 = "0.10"
+
+[dev-dependencies]
+rand = "0.8"
+broker = { path = "../broker" }

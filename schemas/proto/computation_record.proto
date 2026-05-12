@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package governance.schemas;
+
+message ComputationRecord {
+    string computation_id = 1;     // e.g., "dosage_calculator"
+    string code_hash = 2;          // SHA-256 of the verified binary/circuit
+    string version = 3;
+    string audit_status = 4;       // "certified", "pending_review", "revoked"
+    repeated string consumes = 5;  // oracle source_ids this code may read
+    string description = 6;
+}

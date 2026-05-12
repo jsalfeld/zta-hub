@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package governance.schemas;
+
+message SignedDataRecord {
+    // Identifier of the trusted source (e.g., "aml_pipeline")
+    string source_id = 1;
+    // Version of the data format or specific feed
+    string version_id = 2;
+    // Unix timestamp of data publication
+    uint64 timestamp = 3;
+    // Canonicalized JSON or protobuf bytes
+    bytes payload = 4;
+    // Cryptographic signature from the trusted source
+    bytes signature = 5;
+}
+
+message TEEAttestation {
+    string enclave_measurement = 1;
+    bytes attestation_report = 2;
+    string platform = 3;
+}
+
+message ZKProof {
+    string proof_system = 1;
+    bytes verification_key = 2;
+    bytes proof = 3;
+    bytes public_inputs = 4;
+}
+
+message ComputationProof {
+    string computation_id = 1;
+    string code_hash = 2;
+    repeated string input_data_hashes = 3;
+    bytes output_payload = 4;
+    bytes output_hash = 5;
+    TEEAttestation tee_attestation = 6;
+    ZKProof zk_proof = 7;
+    string intent_id = 8;
+}
+
+message ActionRequest {
+    // Unique ID for idempotency and tracking
+    string request_id = 1;
+    
+    // The class of the agent making the request (e.g., "medical_agent_v1")
+    string agent_attestation_class = 2;
+    
+    // The type of action requested (e.g., "prescribe_medication")
+    string action_type = 3;
+    
+    // The specific parameters requested (JSON or protobuf bytes)
+    bytes requested_parameters = 4;
+    
+    // Pre-resolved external data records (Flavor 2 prerequisites)
+    repeated SignedDataRecord external_data = 5;
+    
+    // Pre-resolved prior action receipts (Flavor 1 prerequisites)
+    repeated SignedDataRecord prior_execution_receipts = 6;
+    
+    // Computation proofs for locally run models/logic
+    repeated ComputationProof computation_proofs = 7;
+}

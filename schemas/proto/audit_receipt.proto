@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package governance.schemas;
+
+message AuditReceipt {
+    // Unique identifier for this audit log entry
+    string audit_id = 1;
+    
+    // ID of the request that triggered this decision
+    string request_id = 2;
+    
+    // "APPROVED" or "DENIED"
+    string decision = 3;
+    
+    // Hash of the exact policy version that evaluated this request
+    string policy_version_hash = 4;
+    
+    // Hashes of the SignedDataRecords used in the evaluation
+    repeated string evaluated_data_hashes = 5;
+    
+    // The token generated, if approved
+    string generated_token_id = 6;
+    
+    // Cryptographic signature over the receipt by the Engine
+    bytes engine_signature = 7;
+}

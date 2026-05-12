@@ -1,0 +1,8 @@
+[package]
+name = "state"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+schemas = { path = "../schemas" }
+sha2 = "0.10"

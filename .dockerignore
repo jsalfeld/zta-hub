@@ -1,0 +1,11 @@
+target/
+.git/
+.logs/
+.DS_Store
+*.swp
+.env
+.env.local
+.idea/
+.vscode/
+examples/medical/oracle/venv/
+examples/medical/oracle/*.log

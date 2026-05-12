@@ -1,0 +1,26 @@
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Docker & IDE
+.idea/
+.vscode/
+*.swp
+
+# Python
+**/venv/
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+.logs/

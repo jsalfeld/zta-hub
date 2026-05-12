@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hub_admin
+      POSTGRES_PASSWORD: supersecretpassword
+      POSTGRES_DB: governance_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hub_admin -d governance_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  governance-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgres://hub_admin:supersecretpassword@postgres:5432/governance_db
+      - HUB_CONFIG_DIR=/app/config
+      - RUST_LOG=info
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./examples/medical:/app/config
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package governance.schemas;
+
+// A short-lived, single-use token granting the right to execute an action.
+message CapabilityToken {
+    // Unique identifier for this token
+    string token_id = 1;
+    
+    // The action type this token authorizes (e.g., "prescribe_medication")
+    string action_type = 2;
+    
+    // Audit log identifier this capability was derived from
+    string audit_id = 3;
+    
+    // Unix timestamp when this token expires
+    uint64 expires_at = 4;
+    
+    // JSON or serialized protobuf containing the specific parameters
+    // authorized (e.g., {"patient_id": "P-12345", "medication": "amoxicillin"})
+    bytes effect_parameters = 5;
+    
+    // Cryptographic signature from the Policy Engine over the above fields
+    bytes engine_signature = 6;
+}
