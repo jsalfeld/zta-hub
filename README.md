@@ -41,13 +41,15 @@ The Zero-Trust Action Hub enforces the **Courier Pattern**:
 1. **No Direct Execution**: The agent cannot execute high-risk actions directly.
 2. **Intent Declaration**: The agent must first declare its intent to the Hub and receive a unique `intent_id`.
 3. **Cryptographic Proof Collection**: The agent acts as a courier, gathering attestations by interacting with isolated, external microservices (Oracles) and/or performing local computations. The Oracles verify specific business logic and mint cryptographic receipts (Ed25519 signatures), while computations are verified via TEE or Zero-Knowledge proofs. All proofs are strictly bound to the `intent_id`.
-4. **Final Evaluation**: The agent submits the collection of receipts to the Zero-Trust Action Hub. The Hub evaluates the receipts against a deterministic mathematical policy written in [AWS Cedar](https://www.cedarpolicy.com/). If the receipts satisfy the policy, the Hub issues a final execution token and logs an unbreakable Merkle-chained audit record.
+4. **Final Evaluation**: The agent submits the collection of receipts to the Zero-Trust Action Hub. The Hub evaluates the receipts against a deterministic mathematical policy written in [AWS Cedar](https://www.cedarpolicy.com/). If the receipts satisfy the policy, the Hub issues a final execution token and logs an unbreakable hash-chained audit record.
 
 ### Execution Modes
 
 Each skill can be configured with an `execution_mode`:
 
 - **`broker_mediated`** (default): After successful policy evaluation, the Hub acts as a secure internal broker to execute the final action on behalf of the agent, mints an execution receipt, and returns the receipt to the agent.
+  > [!WARNING]
+  > **Current Status:** The broker layer is currently a stub that logs the capability token and returns `Ok`. Actual execution side-effects (e.g., hitting internal APIs) must be implemented in `broker/src/credential_broker.rs`.
 - **`self_service_token`**: The Hub evaluates policy and returns the signed capability token directly to the agent, which then presents it to the downstream service. This is useful when the downstream service is on a different network, requires agent-local context, or the agent itself is the executor. An audit log entry is still recorded.
 
 ## How It Differs from Access Control
@@ -87,7 +89,7 @@ Access control (MCP gateways, OAuth, API keys) governs **who can call what**. Th
                     │  Check intent binding    │
                     │  Evaluate Cedar policy   │
                     │  Execute or issue token  │
-                    │  Log to Merkle chain     │
+                    │  Log to hash chain     │
                     └──────────────────────────┘
 ```
 
@@ -99,7 +101,7 @@ In current agent architectures, compliance checks — whether implemented as gua
 - **Intent binding.** Every Oracle receipt is bound to a unique `intent_id`. Receipts from a different intent are rejected, preventing replay.
 - **Declarative governance.** Governed actions are defined as configuration (skills + Cedar policies), not code. Oracles are reusable across actions.
 - **Agent self-discovery.** Agents read governance requirements at runtime via auto-generated `skill.md` docs, rather than having compliance logic hardcoded per process.
-- **Independent verifiability.** The audit trail is Merkle-chained and contains the original signed receipts. A third party can verify any decision by checking Oracle signatures and walking the chain.
+- **Independent verifiability.** The audit trail is hash-chained and contains the original signed receipts. A third party can verify any decision by checking Oracle signatures and walking the chain.
 - **Action composition.** Execution receipts can be submitted as prerequisites for subsequent actions, cryptographically proving a prior action was itself governed.
 - **Verified computation.** Agents can execute local computations (data transformations, ML inference) and submit TEE or Zero-Knowledge proofs of the output. The Hub verifies these proofs against a registry of approved code hashes and injects the verified output into the Cedar policy context.
 
@@ -108,13 +110,15 @@ In current agent architectures, compliance checks — whether implemented as gua
 - `hub_server/`: The Axum-based async HTTP server that exposes the REST API for intent creation and execution.
 - `engine/`: The core evaluation engine that parses and evaluates AWS Cedar policies.
 - `broker/`: The execution layer that verifies the Hub Engine's internal capability tokens and performs the final side-effects (acting as the secure broker). Note: External Oracle signatures are verified upstream by the engine.
-- `state/`: Merkle-chained audit log implementation for tamper-evident record keeping.
 - `schemas/`: Shared data models and cryptographic structures (e.g., `SignedDataRecord`).
 - `examples/`: Sample configurations demonstrating how to run the Hub for specific verticals (e.g., a Healthcare workflow).
 
 ## Integration Guide
 
 The Hub ships with a medical example, but it is domain-agnostic. To integrate the ZTA Hub into your own system, you provide four things: **skills**, **policies**, **Oracles**, and **trusted sources**. The Hub handles everything else — cryptographic verification, policy evaluation, audit logging, and token issuance.
+
+> [!NOTE]
+> **Medical Example Context:** The included medical example (`examples/medical/oracle/oracle.py`) uses a hardcoded Python Flask server. It is meant purely to demonstrate the Ed25519 cryptographic signing flow and does not perform real EHR or Drug Interaction lookups.
 
 Your configuration directory (pointed to by `HUB_CONFIG_DIR`) should look like this:
 
@@ -375,6 +379,9 @@ No agent SDK required. Any agent that can make HTTP calls works.
 ### Step 7: Verified Computation (Optional)
 
 For cases where an agent needs to run local computation (ML inference, data transformation) and the Hub needs to trust the output, you can use **Verified Computation**. This requires the agent to submit a TEE attestation or Zero-Knowledge proof alongside the computation output.
+
+> [!WARNING]
+> **Current Status:** The Hub currently ships with a `MockVerifier` for local testing. Production TEE (e.g., AWS Nitro Enclaves) and ZK (e.g., Groth16) verifiers must be implemented by fulfilling the `ComputationVerifier` trait.
 
 **Register a computation** by placing a JSON file in `computations/`:
 
