@@ -2,7 +2,6 @@
 members = [
     "schemas",
     "engine",
-    "state",
     "broker",
     "hub_server"
 ]

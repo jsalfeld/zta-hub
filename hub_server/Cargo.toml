@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 schemas = { path = "../schemas" }
 engine = { path = "../engine" }
-state = { path = "../state" }
 broker = { path = "../broker" }
 
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }

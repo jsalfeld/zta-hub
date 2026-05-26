@@ -40,8 +40,8 @@ Traditional agent architectures rely on the **Legacy Tool-Calling Pattern**. In 
 The Zero-Trust Action Hub enforces the **Courier Pattern**:
 1. **No Direct Execution**: The agent cannot execute high-risk actions directly.
 2. **Intent Declaration**: The agent must first declare its intent to the Hub and receive a unique `intent_id`.
-3. **Cryptographic Proof Collection**: The agent acts as a courier, gathering attestations by interacting with isolated, external microservices (Oracles) and/or performing local computations. The Oracles verify specific business logic and mint cryptographic receipts (Ed25519 signatures), while computations are verified via TEE or Zero-Knowledge proofs. All proofs are strictly bound to the `intent_id`.
-4. **Final Evaluation**: The agent submits the collection of receipts to the Zero-Trust Action Hub. The Hub evaluates the receipts against a deterministic mathematical policy written in [AWS Cedar](https://www.cedarpolicy.com/). If the receipts satisfy the policy, the Hub issues a final execution token and logs an unbreakable hash-chained audit record.
+3. **Cryptographic Proof Collection**: The agent acts as a courier, gathering attestations by interacting with isolated, external microservices (Oracles) and/or performing local computations. The Oracles verify specific business logic and mint cryptographic receipts (Ed25519 signatures), while computations can be verified via TEE or Zero-Knowledge proofs (see Verified Computation section). All proofs are strictly bound to the `intent_id`.
+4. **Final Evaluation**: The agent submits the collection of receipts to the Zero-Trust Action Hub. The Hub evaluates the receipts against a deterministic mathematical policy written in [AWS Cedar](https://www.cedarpolicy.com/). If the receipts satisfy the policy, the Hub issues a final execution token and logs a hash-chained audit record.
 
 ### Execution Modes
 
@@ -101,9 +101,9 @@ In current agent architectures, compliance checks — whether implemented as gua
 - **Intent binding.** Every Oracle receipt is bound to a unique `intent_id`. Receipts from a different intent are rejected, preventing replay.
 - **Declarative governance.** Governed actions are defined as configuration (skills + Cedar policies), not code. Oracles are reusable across actions.
 - **Agent self-discovery.** Agents read governance requirements at runtime via auto-generated `skill.md` docs, rather than having compliance logic hardcoded per process.
-- **Independent verifiability.** The audit trail is hash-chained and contains the original signed receipts. A third party can verify any decision by checking Oracle signatures and walking the chain.
+- **Independent verifiability.** The audit trail is hash-chained and contains the original signed receipts. A third party can verify any decision by checking Oracle signatures and walking the chain. *Note: The Hub's signing key is currently ephemeral — regenerated on restart. For persistent cross-session verifiability, wire `engine_signing_key` to a KMS-backed persistent key.*
 - **Action composition.** Execution receipts can be submitted as prerequisites for subsequent actions, cryptographically proving a prior action was itself governed.
-- **Verified computation.** Agents can execute local computations (data transformations, ML inference) and submit TEE or Zero-Knowledge proofs of the output. The Hub verifies these proofs against a registry of approved code hashes and injects the verified output into the Cedar policy context.
+- **Verified computation.** Agents can execute local computations (data transformations, ML inference) and submit TEE or Zero-Knowledge proofs of the output. The Hub verifies these proofs against a registry of approved code hashes and injects the verified output into the Cedar policy context (design-only in v0.1 — see Verified Computation section).
 
 ## Repository Structure
 
