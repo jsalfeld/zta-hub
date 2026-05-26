@@ -18,18 +18,13 @@ pub struct EvaluationResult {
     pub computation_proof_hashes: Vec<String>,
 }
 
-#[derive(serde::Deserialize, serde::Serialize, Clone, PartialEq, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Clone, PartialEq, Debug, Default)]
 pub enum ExecutionMode {
     #[serde(rename = "broker_mediated")]
+    #[default]
     BrokerMediated,
     #[serde(rename = "self_service_token")]
     SelfServiceToken,
-}
-
-impl Default for ExecutionMode {
-    fn default() -> Self {
-        ExecutionMode::BrokerMediated
-    }
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
@@ -83,6 +78,12 @@ pub struct PolicyEvaluator {
     pub computation_registry: ComputationRegistry,
     pub verifiers: HashMap<String, Box<dyn ComputationVerifier>>,
     engine_signing_key: Option<SigningKey>,
+}
+
+impl Default for PolicyEvaluator {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PolicyEvaluator {

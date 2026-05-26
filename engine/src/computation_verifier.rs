@@ -45,6 +45,12 @@ pub trait ComputationVerifier: Send + Sync {
 /// A mock verifier for local testing that automatically passes if the platform matches "mock".
 pub struct MockVerifier;
 
+impl Default for MockVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MockVerifier {
     pub fn new() -> Self {
         Self

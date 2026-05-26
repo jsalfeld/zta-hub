@@ -18,7 +18,6 @@ use rand::RngCore;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{PgPool, Row};
 use sha2::{Sha256, Digest};
-use hex;
 use tracing::{info, error, debug};
 
 #[derive(Clone)]
@@ -273,7 +272,7 @@ async fn execute_action(
 
     let evaluator = state.evaluator.lock().await;
     let result = evaluator.evaluate_request(&payload, &intent_id)
-        .map_err(|e| HubError::PolicyDenied(e))?;
+        .map_err(HubError::PolicyDenied)?;
 
     let execution_mode = evaluator.skills.get(&intent.action_type)
         .map(|s| s.execution_mode.clone())
@@ -466,7 +465,7 @@ async fn get_skill_md(
             ExecutionMode::SelfServiceToken => "self_service_token",
         };
         md.push_str("## Metadata\n\n");
-        md.push_str(&format!("| Field | Value |\n|-------|-------|\n"));
+        md.push_str("| Field | Value |\n|-------|-------|\n");
         md.push_str(&format!("| Risk Level | {} |\n", skill.contract.risk_classification));
         md.push_str(&format!("| Execution Mode | {} |\n", mode_str));
         md.push_str(&format!("| Version | {} |\n", skill.contract.version));
