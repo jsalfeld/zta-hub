@@ -516,4 +516,4 @@ Returns details for a specific registered computation.
 
 ## License
 
-Licensed under the GNU Affero General Public License, Version 3.0 (AGPL-3.0). See [LICENSE](LICENSE) for details.
+Licensed under the MIT License. See [LICENSE](LICENSE) for details.
