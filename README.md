@@ -514,6 +514,12 @@ Returns all registered verified computations.
 
 Returns details for a specific registered computation.
 
+## Paper
+
+This repository is the reference implementation for the working paper:
+
+**Governing Actions, Not Agents: Institutional Attestation as a Governance Model for Autonomous AI Systems.** Jakob Salfeld-Nebgen (metaphora.ai), 2026. [PDF](governing-actions-not-agents-v6.pdf) · arXiv: _forthcoming_
+
 ## License
 
 Licensed under the MIT License. See [LICENSE](LICENSE) for details.
