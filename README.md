@@ -4,6 +4,16 @@ The **Zero-Trust Action Hub** is a standalone, Zero-Trust Policy Decision Point 
 
 This repository provides a headless, API-first infrastructure component that operates independently of any specific agent framework or business logic.
 
+### Paper
+
+This repository is the reference implementation for the working paper:
+
+**Governing Actions, Not Agents: Institutional Attestation as a Governance Model for Autonomous AI Systems.** Jakob Salfeld-Nebgen (metaphora.ai), 2026. [PDF](https://arxiv.org/pdf/2606.26298)) · [arXiv:2606.26298](https://arxiv.org/abs/2606.26298)
+
+### License
+
+Licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
 ## Quick Start: See It in 60 Seconds
 
 ### 1. Launch the Hub
@@ -513,13 +523,3 @@ Returns all registered verified computations.
 ### `GET /v1/computations/:computation_id`
 
 Returns details for a specific registered computation.
-
-## Paper
-
-This repository is the reference implementation for the working paper:
-
-**Governing Actions, Not Agents: Institutional Attestation as a Governance Model for Autonomous AI Systems.** Jakob Salfeld-Nebgen (metaphora.ai), 2026. [PDF](governing-actions-not-agents-v6.pdf) · arXiv: _forthcoming_
-
-## License
-
-Licensed under the MIT License. See [LICENSE](LICENSE) for details.
